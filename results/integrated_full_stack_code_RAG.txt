@@ -1,0 +1,122 @@
+Below is an implementation of the requested application:
+
+**Backend:**
+
+```python
+from flask import Flask, request, jsonify
+import requests
+
+app = Flask(__name__)
+
+# Load API Keys
+request_key = 'YOUR_REQUEST_KEY'
+base_url = 'https://api.sikkasoft.com'
+
+def get_payment_types():
+    params = {
+        'request_key': request_key,
+    }
+    response = requests.get(f'{base_url}/payment_types', params=params)
+    return response.json()
+
+def get_payment_plans():
+    params = {
+        'request_key': request_key,
+    }
+    response = requests.get(f'{base_url}/payment_plans', params=params)
+    return response.json()
+
+# Route for getting payment types
+@app.route('/payment-types', methods=['GET'])
+def get_payment_types_route():
+    payment_types = get_payment_types()
+    return jsonify(payment_types)
+
+# Route for getting payment plans
+@app.route('/payment-plans', methods=['GET'])
+def get_payment_plans_route():
+    payment_plans = get_payment_plans()
+    return jsonify(payment_plans)
+```
+
+**Frontend:**
+
+```html
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        button {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Payment System</h1>
+    <button id="get-payment-types">Get Payment Types</button>
+    <div id="payment-types"></div>
+
+    <button id="get-payment-plans">Get Payment Plans</button>
+    <div id="payment-plans"></div>
+
+    <script>
+        const getPaymentTypesButton = document.getElementById('get-payment-types');
+        const paymentTypesDiv = document.getElementById('payment-types');
+
+        const getPaymentPlansButton = document.getElementById('get-payment-plans');
+        const paymentPlansDiv = document.getElementById('payment-plans');
+
+        // Function to handle GET request for payment types
+        function getPaymentTypes() {
+            fetch('/payment-types')
+                .then(response => response.json())
+                .then(data => {
+                    let codeList = '';
+                    data.forEach(item => {
+                        codeList += item.code + ',';
+                    });
+                    console.log(codeList);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Function to handle GET request for payment plans
+        function getPaymentPlans() {
+            fetch('/payment-plans')
+                .then(response => response.json())
+                .then(data => {
+                    let agreementId = data.items[0].agreement_id;
+                    let patientId = data.items[0].patient_id;
+                    let guarantorId = data.items[0].guarantor_id;
+
+                    console.log(agreementId);
+                    console.log(patientId);
+                    console.log(guarantorId);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        getPaymentTypesButton.addEventListener('click', getPaymentTypes);
+        getPaymentPlansButton.addEventListener('click', getPaymentPlans);
+    </script>
+</body>
+</html>
+```
+
+**Explanation:**
+
+The provided code sets up a basic Flask backend that handles GET requests for payment types and payment plans. The frontend is implemented using HTML, CSS, and JavaScript.
+
+The Flask backend loads the `request_key` from a secure source (not shown in this implementation). The `get_payment_types()` function calls the `payment_types` API endpoint with the loaded request key. Similarly, the `get_payment_plans()` function calls the `payment_plans` API endpoint with the same request key.
+
+The frontend HTML includes two buttons for getting payment types and payment plans. When these buttons are clicked, they trigger JavaScript functions that handle the corresponding GET requests to the Flask backend.
+
+Please note that you need to replace `'YOUR_REQUEST_KEY'` in the provided code with your actual `request_key`.
